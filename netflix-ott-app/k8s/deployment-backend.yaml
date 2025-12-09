@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ott-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ott-backend
+  template:
+    metadata:
+      labels:
+        app: ott-backend
+    spec:
+      containers:
+      - name: backend
+        image: imi1998/ott-backend:v1
+        ports:
+        - containerPort: 5000
+
