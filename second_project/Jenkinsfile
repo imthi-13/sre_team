@@ -9,12 +9,17 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        checkout scm
+        git branch: 'main',
+            credentialsId: '33b77918-1570-4050-a0c8-78b1e7eacf47',
+            url: 'https://github.com/imthi-13/sre_team'
+
+        sh 'echo "Workspace content:"'
+        sh 'ls -R'
       }
     }
     stage('Build Image') {
       steps {
-        dir('app') {
+        dir('second_project/app') {
           sh "docker build -t ${IMAGE_REPO}:${IMAGE_TAG} ."
         }
       }
@@ -35,17 +40,14 @@ pipeline {
     }
     stage('Deploy to k8s') {
       steps {
-        withCredentials([string(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
-          sh '''
-            mkdir -p $HOME/.kube
-            echo "$KUBECONFIG_CONTENT" > $HOME/.kube/config
-            kubectl apply -f k8s/namespace.yaml
-            # Replace placeholder in deployment with actual image tag
-            sed "s|<REGISTRY>/<REPO>:<TAG>|${IMAGE_REPO}:${IMAGE_TAG}|g" k8s/deployment.yaml | kubectl apply -f -
-            kubectl apply -f k8s/configmap.yaml
-            kubectl apply -f k8s/service.yaml
-            kubectl apply -f k8s/ingress.yaml
-          '''
+         withKubeConfig(credentialsId: 'kubeconfig') {
+            sh '''
+            kubectl apply -f second_project/k8s/namespace.yaml
+            kubectl apply -f second_project/k8s/configmap.yaml
+            kubectl apply -f second_project/k8s/service.yaml
+            kubectl apply -f second_project/k8s/deployment.yaml
+            kubectl apply -f second_project/k8s/ingress.yaml
+            '''
         }
       }
     }
