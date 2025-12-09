@@ -9,7 +9,9 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        checkout scm
+        git credentialsId: '33b77918-1570-4050-a0c8-78b1e7eacf47', url: 'https://github.com/imthi-13/sre_team'
+        sh 'echo "Workspace content:"'
+        sh 'ls -R'
       }
     }
     stage('Build Image') {
