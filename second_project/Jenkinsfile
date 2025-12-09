@@ -19,7 +19,7 @@ pipeline {
     }
     stage('Build Image') {
       steps {
-        dir('app') {
+        dir('second_project/app') {
           sh "docker build -t ${IMAGE_REPO}:${IMAGE_TAG} ."
         }
       }
