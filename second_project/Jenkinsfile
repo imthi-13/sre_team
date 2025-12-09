@@ -40,17 +40,14 @@ pipeline {
     }
     stage('Deploy to k8s') {
       steps {
-        withCredentials([string(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
-          sh '''
-            mkdir -p $HOME/.kube
-            echo "$KUBECONFIG_CONTENT" > $HOME/.kube/config
-            kubectl apply -f k8s/namespace.yaml
-            # Replace placeholder in deployment with actual image tag
-            sed "s|<REGISTRY>/<REPO>:<TAG>|${IMAGE_REPO}:${IMAGE_TAG}|g" k8s/deployment.yaml | kubectl apply -f -
-            kubectl apply -f k8s/configmap.yaml
-            kubectl apply -f k8s/service.yaml
-            kubectl apply -f k8s/ingress.yaml
-          '''
+         withKubeConfig(credentialsId: 'kubeconfig') {
+            sh '''
+            kubectl apply -f second_project/k8s/namespace.yaml
+            kubectl apply -f second_project/k8s/configmap.yaml
+            kubectl apply -f second_project/k8s/service.yaml
+            kubectl apply -f second_project/k8s/deployment.yaml
+            kubectl apply -f second_project/k8s/ingress.yaml
+            '''
         }
       }
     }
