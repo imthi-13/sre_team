@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE = "imi1998/netflix:${BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/you/netflix-project.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh """
+                docker build -t $IMAGE .
+                """
+            }
+        }
+
+        stage('Push to Registry') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub_creds',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh """
+                    docker login -u $USER -p $PASS
+                    docker push $IMAGE
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh """
+                sed -i 's|imi1998/netflix:latest|$IMAGE|g' k8s/deployment.yaml
+                kubectl apply -f k8s/
+                """
+            }
+        }
+    }
+}
+
