@@ -49,6 +49,7 @@ pipeline {
                     sed -i 's|imi1998/netflix:latest|$IMAGE|g' netflix-project/k8s/deployment.yaml
                     kubectl apply -f netflix-project/k8s/ --validate=false
                     """
+                }
             }
         }
     }
