@@ -20,7 +20,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh """
-                docker build -t $IMAGE /netflix-project
+                cd netflix-project
+                docker build -t $IMAGE .
                 """
             }
         }
