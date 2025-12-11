@@ -44,7 +44,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh """
-                sed -i 's|imi1998/netflix:latest|$IMAGE|g' k8s/deployment.yaml
+                sed -i 's|imi1998/netflix:latest|$IMAGE|g' /netflix-project/k8s/deployment.yaml
                 kubectl apply -f k8s/
                 """
             }
